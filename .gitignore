@@ -1,0 +1,70 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+.log
+logs/
+*.log
+*.csv
+debug.log
+error.log
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build files
+dist/
+build/
+
+# Editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Prisma files (if using Prisma ORM)
+prisma/.env
+prisma/migrations/
+
+# TypeScript files (if using TypeScript)
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Docker files (if using Docker)
+docker-compose.override.yml
+.dockerignore
+
+# Next.js / React Build (if using frontend)
+.next/
+out/
+
+# Miscellaneous
+*.swp
+*.swo

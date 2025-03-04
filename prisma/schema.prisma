@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  products  Product[]
+
+  @@unique([name])
+}
+
+model Product {
+  id          Int               @id @default(autoincrement())
+  name        String            @db.VarChar(255)
+  price       Decimal           @default(0) @db.Decimal(10,2)
+  storeId     Int
+  store       Store             @relation(fields: [storeId], references: [id])
+  categories  ProductCategory[]
+  imageUrl    String?           // ActiveStorage equivalent
+
+  @@unique([name, storeId])
+}
+
+model Category {
+  id        Int               @id @default(autoincrement())
+  name      String            @db.VarChar(255)
+  products  ProductCategory[]
+
+  @@unique([name])
+}
+
+model ProductCategory {
+  productId  Int
+  categoryId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId]) // Composite primary key
+}
