@@ -1,14 +1,17 @@
+import csrf from "csurf";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import cookieParser from "cookie-parser";
-import csrf from "csurf";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const csrfProtection = csrf({ cookie: true });
+const csrfProtection =
+  process.env.NODE_ENV === "test"
+    ? (req: any, res: any, next: any) => next() // Disable CSRF in tests
+    : csrf({ cookie: true });
 
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || "*",
@@ -16,10 +19,13 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
-});
+const limiter =
+  process.env.NODE_ENV === "test"
+    ? (req: any, res: any, next: any) => next() // Disable rate limiting in tests
+    : rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // Limit each IP to 100 requests per window
+      });
 
 export {
   corsOptions,

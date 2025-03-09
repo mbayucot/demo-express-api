@@ -3,8 +3,12 @@ import dotenv from "dotenv";
 import { logger, morgan } from "./middlewares/logger";
 import { notFoundHandler, errorHandler } from "./middlewares/errorHandler";
 import { corsOptions, csrfProtection, limiter, helmet, compression, cookieParser, cors } from "./middlewares/security";
+import storeRoutes from "./routes/storeRoutes";
 
-dotenv.config();
+// Load environment variables based on NODE_ENV
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? ".env.test" : ".env",
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,10 +31,17 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello, Express with TypeScript!");
 });
 
+// Mount Routes
+app.use("/stores", storeRoutes);
+
 // Error Handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
