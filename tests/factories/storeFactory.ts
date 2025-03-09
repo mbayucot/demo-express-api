@@ -7,7 +7,7 @@ export const createStore = async (): Promise<Store> => {
   return prisma.store.create({
     data: {
       name: faker.company.name(),
-      address: faker.address.streetAddress(),
+      address: faker.location.streetAddress(), // ✅ Fixed deprecated usage
     },
   });
 };

@@ -8,7 +8,7 @@ describe("Store API", () => {
   it("should create a store", async () => {
     const storeData = {
       name: faker.company.name(),
-      address: faker.address.streetAddress(),
+      address: faker.location.streetAddress(), // ✅ Fixed deprecated usage
     };
 
     const response = await request(app)
@@ -39,7 +39,7 @@ describe("Store API", () => {
 
     const updatedData = {
       name: faker.company.name(),
-      address: faker.address.streetAddress(),
+      address: faker.location.streetAddress(), // ✅ Fixed deprecated usage
     };
 
     const response = await request(app)

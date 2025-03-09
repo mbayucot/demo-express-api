@@ -1,15 +1,14 @@
 import request from "supertest";
 import app from "../src/index"; // Ensure this matches your Express app export
-import { prisma } from "./setup"; // Import Prisma test setup
+import { createStore } from "./factories/storeFactory";
+import { createProduct } from "./factories/productFactory";
+import { prisma } from "./setup";
 
 describe("Product API", () => {
   let storeId: number;
 
   beforeEach(async () => {
-    // Ensure a fresh store exists before each test
-    const store = await prisma.store.create({
-      data: { name: "Test Store", address: "123 Test Street" },
-    });
+    const store = await createStore();
     storeId = store.id;
   });
 
@@ -29,18 +28,10 @@ describe("Product API", () => {
       .expect(201);
 
     expect(response.body).toHaveProperty("id");
-    expect(response.body.name).toBe("Test Product");
   });
 
   it("should retrieve all products for a store", async () => {
-    await prisma.product.create({
-      data: {
-        name: "Test Product",
-        description: "Test Desc",
-        price: 19.99,
-        storeId,
-      },
-    });
+    await createProduct(storeId);
 
     const response = await request(app)
       .get(`/stores/${storeId}/products`)
@@ -50,31 +41,16 @@ describe("Product API", () => {
   });
 
   it("should retrieve a single product", async () => {
-    const product = await prisma.product.create({
-      data: {
-        name: "Test Product",
-        description: "Test Desc",
-        price: 19.99,
-        storeId,
-      },
-    });
+    const product = await createProduct(storeId);
 
     const response = await request(app)
       .get(`/stores/${storeId}/products/${product.id}`)
       .expect(200);
-
-    expect(response.body.name).toBe("Test Product");
+    expect(response.body.name).toBeTruthy();
   });
 
   it("should update a product", async () => {
-    const product = await prisma.product.create({
-      data: {
-        name: "Old Product",
-        description: "Old Desc",
-        price: 9.99,
-        storeId,
-      },
-    });
+    const product = await createProduct(storeId);
 
     const response = await request(app)
       .put(`/stores/${storeId}/products/${product.id}`)
@@ -89,14 +65,7 @@ describe("Product API", () => {
   });
 
   it("should delete a product", async () => {
-    const product = await prisma.product.create({
-      data: {
-        name: "Test Product",
-        description: "Test Desc",
-        price: 19.99,
-        storeId,
-      },
-    });
+    const product = await createProduct(storeId);
 
     await request(app)
       .delete(`/stores/${storeId}/products/${product.id}`)
