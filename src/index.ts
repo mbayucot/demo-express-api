@@ -2,9 +2,17 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { logger, morgan } from "./middlewares/logger";
 import { notFoundHandler, errorHandler } from "./middlewares/errorHandler";
-import { corsOptions, limiter, helmet, compression, cookieParser, cors } from "./middlewares/security";
+import {
+  corsOptions,
+  limiter,
+  helmet,
+  compression,
+  cookieParser,
+  cors,
+} from "./middlewares/security";
 import storeRoutes from "./routes/storeRoutes";
 import authRoutes from "./routes/authRoutes";
+import productRoutes from "./routes/productRoutes";
 import passport from "./config/passport";
 import { swaggerUi, swaggerSpec } from "./config/swagger";
 
@@ -37,8 +45,17 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Mount Routes
-app.use("/stores", storeRoutes);
+app.use(
+  "/stores",
+  passport.authenticate("jwt", { session: false }),
+  storeRoutes,
+);
+app.use(
+  "/products",
+  passport.authenticate("jwt", { session: false }),
+  productRoutes,
+);
+
 app.use("/auth", authRoutes);
 
 // Error Handling
