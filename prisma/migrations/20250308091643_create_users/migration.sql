@@ -2,7 +2,7 @@
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "encryptedPassword" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "resetPasswordToken" TEXT,
     "resetPasswordSentAt" TIMESTAMP(3),
     "rememberCreatedAt" TIMESTAMP(3),

@@ -2,8 +2,11 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import { logger, morgan } from "./middlewares/logger";
 import { notFoundHandler, errorHandler } from "./middlewares/errorHandler";
-import { corsOptions, csrfProtection, limiter, helmet, compression, cookieParser, cors } from "./middlewares/security";
+import { corsOptions, limiter, helmet, compression, cookieParser, cors } from "./middlewares/security";
 import storeRoutes from "./routes/storeRoutes";
+import authRoutes from "./routes/authRoutes";
+import passport from "./config/passport";
+import { swaggerUi, swaggerSpec } from "./config/swagger";
 
 // Load environment variables based on NODE_ENV
 dotenv.config({
@@ -23,16 +26,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(limiter);
-app.use(csrfProtection);
 
 app.use(express.json());
+
+app.use(passport.initialize());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, Express with TypeScript!");
 });
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Mount Routes
 app.use("/stores", storeRoutes);
+app.use("/auth", authRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

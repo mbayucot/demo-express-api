@@ -8,11 +8,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const csrfProtection =
-  process.env.NODE_ENV === "test"
-    ? (req: any, res: any, next: any) => next() // Disable CSRF in tests
-    : csrf({ cookie: true });
-
 const corsOptions = {
   origin: process.env.CORS_ORIGIN || "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -29,7 +24,6 @@ const limiter =
 
 export {
   corsOptions,
-  csrfProtection,
   limiter,
   helmet,
   compression,
