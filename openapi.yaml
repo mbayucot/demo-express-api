@@ -1,0 +1,436 @@
+openapi: 3.0.0
+info:
+  title: Demo Express API
+  version: 1.0.0
+  description: API documentation for the Demo Express project
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: user@example.com
+        password:
+          type: string
+          example: hashedpassword
+        resetPasswordToken:
+          type: string
+          nullable: true
+        resetPasswordSentAt:
+          type: string
+          format: date-time
+          nullable: true
+        rememberCreatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Best Buy
+        address:
+          type: string
+          example: 123 Main St
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Electronics
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Product Name
+        description:
+          type: string
+          example: A great product description
+          nullable: true
+        price:
+          type: number
+          format: decimal
+          example: 49.99
+        storeId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ProductCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        productId:
+          type: integer
+          example: 1
+        categoryId:
+          type: integer
+          example: 1
+    UserSignup:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: yourpassword
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: user@example.com
+        password:
+          type: string
+          example: yourpassword
+    ProductInput:
+      type: object
+      required:
+        - name
+        - price
+        - storeId
+      properties:
+        name:
+          type: string
+          example: Product Name
+        description:
+          type: string
+          example: Product description (optional)
+        price:
+          type: number
+          format: decimal
+          example: 99.99
+        storeId:
+          type: integer
+          example: 1
+security:
+  - bearerAuth: []
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User created
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Email already in use
+  /auth/login:
+    post:
+      summary: Login a user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: User logged in with JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: your.jwt.token.here
+        '401':
+          description: Invalid credentials
+  /auth/logout:
+    post:
+      summary: Logout the current user
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out
+  /products:
+    get:
+      summary: Get all products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: List of all products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+  /products/{id}:
+    get:
+      summary: Get a product by ID
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+    put:
+      summary: Update a product
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+    delete:
+      summary: Delete a product
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Product deleted
+        '404':
+          description: Product not found
+  /stores:
+    post:
+      summary: Create a new store
+      tags:
+        - Stores
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Store'
+      responses:
+        '201':
+          description: Store created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+    get:
+      summary: Get all stores
+      tags:
+        - Stores
+      responses:
+        '200':
+          description: List of stores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Store'
+  /stores/{id}:
+    get:
+      summary: Get store by ID
+      tags:
+        - Stores
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Store found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Store not found
+    put:
+      summary: Update a store
+      tags:
+        - Stores
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Store'
+      responses:
+        '200':
+          description: Store updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+        '404':
+          description: Store not found
+    delete:
+      summary: Delete a store
+      tags:
+        - Stores
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Store deleted
+        '404':
+          description: Store not found
+  /stores/{storeId}/products:
+    get:
+      summary: Get all products in a store
+      tags:
+        - Stores
+      parameters:
+        - in: path
+          name: storeId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of products for the given store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Products
+    description: Product management
+  - name: Stores
+    description: Store management
