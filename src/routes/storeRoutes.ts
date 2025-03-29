@@ -2,6 +2,8 @@
 
 import { Router } from "express";
 import { StoreController } from "../controllers/storeController";
+import { storeSchema } from "../validators/storeSchema";
+import { validateRequest } from "../middlewares/validateRequest";
 import productRoutes from "./productRoutes";
 
 const router = Router();
@@ -34,7 +36,7 @@ const storeController = new StoreController();
  *             schema:
  *               $ref: '#/components/schemas/Store'
  */
-router.post("/", storeController.create);
+router.post("/", storeSchema, validateRequest, storeController.create);
 
 /**
  * @swagger
@@ -106,7 +108,7 @@ router.get("/:id", storeController.getById);
  *       404:
  *         description: Store not found
  */
-router.put("/:id", storeController.update);
+router.put("/:id", storeSchema, validateRequest, storeController.update);
 
 /**
  * @swagger
