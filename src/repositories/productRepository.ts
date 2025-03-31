@@ -3,13 +3,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export class ProductRepository {
-  // Create a product with optional categories
+  // Create a product with optional categories and image
   async create(
-    name: string,
-    description: string,
-    price: number,
-    storeId: number,
-    categoryIds?: number[],
+      name: string,
+      description: string,
+      price: number,
+      storeId: number,
+      categoryIds?: number[],
+      imageUrl?: string,
   ) {
     return await prisma.product.create({
       data: {
@@ -17,22 +18,29 @@ export class ProductRepository {
         description,
         price,
         storeId,
+        imageUrl,
         categories: categoryIds
-          ? {
+            ? {
               create: categoryIds.map((categoryId) => ({
                 category: { connect: { id: categoryId } },
               })),
             }
-          : undefined,
+            : undefined,
       },
-      include: { categories: { include: { category: true } } },
+      include: {
+        store: true,
+        categories: { include: { category: true } },
+      },
     });
   }
 
   // Find all products, including categories and store
   async findAll() {
     return await prisma.product.findMany({
-      include: { store: true, categories: { include: { category: true } } },
+      include: {
+        store: true,
+        categories: { include: { category: true } },
+      },
     });
   }
 
@@ -40,17 +48,21 @@ export class ProductRepository {
   async findById(id: number) {
     return await prisma.product.findUnique({
       where: { id },
-      include: { categories: { include: { category: true } } },
+      include: {
+        store: true,
+        categories: { include: { category: true } },
+      },
     });
   }
 
-  // Update a product and its categories
+  // Update a product and its categories and image
   async update(
-    id: number,
-    name?: string,
-    description?: string,
-    price?: number,
-    categoryIds?: number[],
+      id: number,
+      name?: string,
+      description?: string,
+      price?: number,
+      categoryIds?: number[],
+      imageUrl?: string,
   ) {
     return await prisma.product.update({
       where: { id },
@@ -58,16 +70,20 @@ export class ProductRepository {
         name,
         description,
         price,
+        imageUrl,
         categories: categoryIds
-          ? {
-              set: [], // Remove old categories
+            ? {
+              set: [],
               create: categoryIds.map((categoryId) => ({
                 category: { connect: { id: categoryId } },
               })),
             }
-          : undefined,
+            : undefined,
       },
-      include: { categories: { include: { category: true } } },
+      include: {
+        store: true,
+        categories: { include: { category: true } },
+      },
     });
   }
 

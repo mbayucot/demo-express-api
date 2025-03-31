@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { ProductRepository } from "../repositories/productRepository";
-import { PrismaClient } from "@prisma/client"; // Needed to check if store exists
+import { PrismaClient } from "@prisma/client";
+import { Express } from "express";
 
-const prisma = new PrismaClient(); // For store validation only
+const prisma = new PrismaClient();
 const productRepository = new ProductRepository();
 
 export class ProductsController {
   // Get all products
-  index = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  index = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
     const products = await productRepository.findAll();
     res.status(200).json(products);
   });
@@ -31,7 +32,6 @@ export class ProductsController {
     const { storeId } = req.params;
     const { name, description, price, categoryIds } = req.body;
 
-    // Ensure store exists
     const store = await prisma.store.findUnique({
       where: { id: Number(storeId) },
     });
@@ -40,13 +40,18 @@ export class ProductsController {
       return;
     }
 
+    const file = req.file as Express.MulterS3.File;
+    const imageUrl = file?.location;
+
     const product = await productRepository.create(
-      name,
-      description,
-      parseFloat(price),
-      Number(storeId),
-      categoryIds,
+        name,
+        description,
+        parseFloat(price),
+        Number(storeId),
+        categoryIds,
+        imageUrl,
     );
+
     res.status(201).json(product);
   });
 
@@ -55,13 +60,18 @@ export class ProductsController {
     const { id } = req.params;
     const { name, description, price, categoryIds } = req.body;
 
+    const file = req.file as Express.MulterS3.File;
+    const imageUrl = file?.location;
+
     const updatedProduct = await productRepository.update(
-      Number(id),
-      name,
-      description,
-      price ? parseFloat(price) : undefined,
-      categoryIds,
+        Number(id),
+        name,
+        description,
+        price ? parseFloat(price) : undefined,
+        categoryIds,
+        imageUrl,
     );
+
     res.status(200).json(updatedProduct);
   });
 

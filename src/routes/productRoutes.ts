@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ProductsController } from "../controllers/productsController";
+import { upload } from "../middlewares/upload";
 
 const router = Router({ mergeParams: true });
 const productsController = new ProductsController();
@@ -124,7 +125,7 @@ router.get("/:id", productsController.show);
  *             schema:
  *               $ref: '#/components/schemas/Product'
  */
-router.post("/", productsController.create);
+router.post("/", upload.single("image"), productsController.create);
 
 /**
  * @swagger
