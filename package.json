@@ -12,13 +12,18 @@
     "test": "cross-env NODE_ENV=test jest --runInBand --forceExit",
     "test:watch": "npm test -- --watch",
     "generate:openapi": "ts-node scripts/generate-openapi.ts",
-    "generate:types": "openapi-typescript openapi.yaml -o src/types/openapi.d.ts"
+    "generate:types": "openapi-typescript openapi.yaml -o src/types/openapi.d.ts",
+    "generate:client": "npx openapi-zod-client ./openapi.yaml -o ./output/client.ts",
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.777.0",
+    "@casl/ability": "^6.7.3",
     "@prisma/client": "^6.5.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -38,6 +43,7 @@
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.2",
     "openapi-fetch": "^0.13.5",
     "openapi-react-query": "^0.3.1",
     "passport": "^0.7.0",

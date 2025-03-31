@@ -21,6 +21,21 @@ services:
     ports:
       - "6379:6379"
 
+  localstack:
+    image: localstack/localstack:latest
+    container_name: express_localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,lambda
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - CLEAR_TMP_FOLDER=0 # 🟢 Prevents the crash
+    volumes:
+      - localstack_data:/tmp/localstack/data
+
 volumes:
   postgres_data:
   redis_data:
+  localstack_data:
