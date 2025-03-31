@@ -1,1 +1,1 @@
-import "../jobs/welcomeEmailJob"; // This will auto-start the worker
+import "../jobs/welcomeEmailJob";

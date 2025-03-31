@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id                  Int       @id @default(autoincrement())
-  email               String    @unique
+  id                  Int          @id @default(autoincrement())
+  email               String       @unique
   password            String
-  resetPasswordToken  String?   @unique
+  resetPasswordToken  String?      @unique
   resetPasswordSentAt DateTime?
   rememberCreatedAt   DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  fileImports         FileImport[]
 }
 
 model Category {
@@ -62,4 +63,28 @@ model ProductCategory {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([productId, categoryId]) // Ensure a product cannot be added to the same category twice
+}
+
+model FileImport {
+  id             Int             @id @default(autoincrement())
+  userId         Int
+  fileUrl        String
+  status         String          @default("pending")
+  processedRows  Int             @default(0)
+  totalRows      Int             @default(0)
+  fileImportLogs FileImportLog[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model FileImportLog {
+  id           Int      @id @default(autoincrement())
+  fileImportId Int
+  status       String
+  message      String
+  createdAt    DateTime @default(now())
+
+  fileImport FileImport @relation(fields: [fileImportId], references: [id])
 }
